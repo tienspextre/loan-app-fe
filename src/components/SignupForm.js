@@ -17,8 +17,8 @@ export default function SignupForm() {
   useEffect(() => {
   })
 
-  const handleSignup  = async () => {
-
+  const handleSignup  = async (event) => {
+      event.preventDefault();
       const response = await fetch('http://localhost:8080/api/auth/signup', {
         method: 'POST',
         headers: {
@@ -44,6 +44,7 @@ export default function SignupForm() {
           sessionStorage.setItem('token', data1.accessToken);
           sessionStorage.setItem('id', data1.id);
           sessionStorage.setItem('role', data1.roles);
+          sessionStorage.setItem('email', data1.email);
           // console.log('Login successful');
           navigate("/signupdetail", {replace: true});
         } else {
@@ -63,20 +64,20 @@ export default function SignupForm() {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title mb-4">Đăng ký tài khoản</h5>
-              <form>
+              <form onSubmit={handleSignup}>
                 <div className="mb-3">
                   <label htmlFor="username" className="form-label">Tên đăng nhập</label>
-                  <input type="text" className="form-control" id="username" placeholder="Tên đăng nhập" value={username} onChange={(e) => setUsername(e.target.value)} />
+                  <input type="text" className="form-control" id="username" placeholder="Tên đăng nhập" value={username} onChange={(e) => setUsername(e.target.value)} required/>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="password" className="form-label">Mật khẩu</label>
-                  <input type="password" className="form-control" id="password" placeholder="Mật khẩu" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <input type="password" className="form-control" id="password" placeholder="Mật khẩu" value={password} onChange={(e) => setPassword(e.target.value)} required/>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">Email</label>
-                  <input type="email" className="form-control" id="email" placeholder="Nhập email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <input type="email" className="form-control" id="email" placeholder="Nhập email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" value={email} onChange={(e) => setEmail(e.target.value)} required/>
                 </div>
-                <button type="button" className="btn btn-primary w-100" onClick={handleSignup}>Đăng ký</button>
+                <button type="submit" className="btn btn-primary w-100" >Đăng ký</button>
               </form>
             </div>
           </div>

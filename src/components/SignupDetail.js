@@ -35,11 +35,13 @@ export default function SignupForm() {
     .catch(error => {
       console.error('Error fetching branches data:', error);
     });
-    setEmail(sessionStorage.getItem('email'));
+    setGender('MALE');
   }, []);
   
 
-  const handleSignup  = async () => {
+  const handleSignup  = async (event) => {
+    event.preventDefault();
+    setEmail(sessionStorage.getItem('email'));
     try {
       const headers = { 'Authorization': `Bearer ${sessionStorage.getItem('token')}`, 'Content-Type': 'application/json; charset=UTF-8', };
       const body = JSON.stringify({id, firstName, lastName, dob, gender, idNumber, phone, email, address})
@@ -53,6 +55,7 @@ export default function SignupForm() {
         if (!response.ok) {
           throw new Error('Failed to post data');
         }
+        alert("Success");
         navigate("/home", {replace: true});
         return response.json();
       })
@@ -78,7 +81,7 @@ export default function SignupForm() {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title mb-4">Nhập thông tin</h5>
-              <form>
+              <form  onSubmit={handleSignup}>
                 <div className="mb-3">
                   <label htmlFor="lastName" className="form-label">Họ</label>
                   <input type="text" className="form-control" id="lastName" placeholder="Nhập họ" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
@@ -134,7 +137,7 @@ export default function SignupForm() {
                   <label htmlFor="address" className="form-label">Địa chỉ</label>
                   <input type="text" className="form-control" id="address" placeholder="Nhập địa chỉ" value={address} onChange={(e) => setAddress(e.target.value)} required/>
                 </div>
-                <button type="submit" className="btn btn-primary w-100" onSubmit={handleSignup}>Lưu thông tin</button>
+                <button type="submit" className="btn btn-primary w-100">Lưu thông tin</button>
               </form>
             </div>
           </div>
