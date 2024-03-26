@@ -70,7 +70,13 @@ export default function Header() {
         unmountOnExit
       >
         <nav className="Nav">
-          <a href="/"> {name} </a>
+          <div>
+            {name ? (
+              <a href="/">Xin chào {name}</a>
+            ) : (
+              <a href="/"></a>
+            )}
+          </div>
           <a href="/home">Danh sách đơn</a>
           <a href="/newloan">Đăng ký vay</a>
           <Link to={name ? "/login" : "/login"} onClick={handleLogout}>{name ? "Logout" : "Login"}</Link>
