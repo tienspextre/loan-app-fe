@@ -1,5 +1,12 @@
 import React, { useEffect } from "react";
 const LandingPage = () => {
+  useEffect(() => {
+    const username = localStorage.getItem("username");
+    if (username) {
+      window.location.href = "home";
+    }
+  });
+
   return (
     <div className="landing-page">
       <main>

@@ -5,13 +5,35 @@ import RequiredSharp from "./RequiredSharp";
 export default function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [validateMessage, setValidMessage] = useState({
+    username: {
+      invalid: false,
+      message: "",
+    },
+    password: {
+      invalid: false,
+      message: "",
+    },
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
     if (sessionStorage.getItem("token")) navigate("/home", { replace: true });
   });
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setValidMessage({
+      username: {
+        invalid: false,
+        message: "",
+      },
+      password: {
+        invalid: false,
+        message: "",
+      },
+    });
+
     try {
       const response = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
@@ -21,8 +43,9 @@ export default function LoginForm() {
         body: JSON.stringify({ username, password }),
       });
 
+      const data = await response.json();
+      console.log(data);
       if (response.ok) {
-        const data = await response.json();
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("tokenType", data.tokenType);
         localStorage.setItem("id", data.id);
@@ -32,12 +55,26 @@ export default function LoginForm() {
 
         window.location.href = "home";
       } else {
-        // Handle login failure
-        alert("Đăng nhập thất bại!");
+        if (data.message === "USERNAME_NOT_EXIST") {
+          setValidMessage((prev) => ({
+            ...prev,
+            username: {
+              invalid: true,
+              message: "username không tồn tại!",
+            },
+          }));
+        } else if (data.message === "PASSWORD_INCORRECT") {
+          setValidMessage((prev) => ({
+            ...prev,
+            password: {
+              invalid: true,
+              message: "Mật khẩu không đúng, vui lòng thử lại!",
+            },
+          }));
+        }
       }
     } catch (error) {
-      // Handle network error
-      alert("Error:", error.message);
+      alert("Hệ thống xảy ra lỗi, vui lòng thử lại!");
     }
   };
 
@@ -55,12 +92,17 @@ export default function LoginForm() {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${
+                      validateMessage.username.invalid ? "is-invalid" : ""
+                    }`}
                     id="username"
                     placeholder="Nhập username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                   />
+                  <div className="invalid-feedback">
+                    {validateMessage.username.message}
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="password" className="form-label">
@@ -68,12 +110,17 @@ export default function LoginForm() {
                   </label>
                   <input
                     type="password"
-                    className="form-control"
+                    className={`form-control ${
+                      validateMessage.password.invalid ? "is-invalid" : ""
+                    }`}
                     id="password"
                     placeholder="Nhập mật khẩu"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                  <div className="invalid-feedback">
+                    {validateMessage.password.message}
+                  </div>
                 </div>
                 <div>
                   Bạn chưa có tài khoản, <a href="/signup">Đăng ký</a>
