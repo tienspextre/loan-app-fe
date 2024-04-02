@@ -1,13 +1,9 @@
 import React, { useEffect } from "react";
-import Header from "../components/Header";
 const LandingPage = () => {
   return (
     <div className="landing-page">
       <main>
         <section className="flex-column">
-          <div className="">
-            <Header />
-          </div>
           <div className="hero-content mt-5 p-4">
             <h1>Ngân hàng ABCDEFBank</h1>
             <p>Đăng ký để vay tiền với lãi suất hấp dẫn</p>

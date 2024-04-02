@@ -14,36 +14,13 @@ export default function Header() {
     mediaQuery.addListener(handleMediaQueryChange);
     handleMediaQueryChange(mediaQuery);
 
-    const token = sessionStorage.getItem("token");
-    if (token) {
-      const headers = {
-        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-      };
-      const id = sessionStorage.getItem("id");
-      fetch(`http://localhost:8080/api/personal-info/${id}`, {
-        headers,
-        mode: "cors",
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Failed to fetch personal info");
-          }
-        })
-        .then((data) => {
-          setName(data.firstName);
-          console.log(data.firstName);
-        })
-        .catch((error) => {
-          // Handle network error
-          console.error("Error:", error.message);
-        });
-    }
+    const storedUsername = localStorage.getItem("username");
+    setName(storedUsername);
+
     return () => {
       mediaQuery.removeListener(handleMediaQueryChange);
     };
-  }, []);
+  }, [name]);
 
   const handleMediaQueryChange = (mediaQuery) => {
     if (mediaQuery.matches) {
@@ -53,20 +30,15 @@ export default function Header() {
     }
   };
 
-  const toggleNav = () => {
-    setNavVisibility(!isNavVisible);
-  };
-
   const handleLogout = () => {
     // Clear sessionStorage
-    sessionStorage.clear();
+    localStorage.clear();
     // Redirect to login page
-    navigate("/login", { replace: true });
   };
 
   return (
     <header className="Header">
-      <a href="/">
+      <a href="/" className="ms-4">
         <img src={require("../assets/logo.png")} className="Logo" alt="logo" />
       </a>
       <CSSTransition
@@ -77,27 +49,18 @@ export default function Header() {
       >
         <nav className="Nav">
           <div>{name ? <a href="/">Xin chào {name}</a> : <a href="/"></a>}</div>
-          <a href="/home">Danh sách đơn</a>
-          <a href="/newloan">Đăng ký vay</a>
-          {/* <div className="flex"> */}
-          <a
-            href={name ? "/logout" : "/login"}
-            className="btn btn-primary"
-            onClick={handleLogout}
-          >
-            {name ? "Đăng xuáta" : "Đăng nhập"}
+          <a href="/home">Hợp đồng</a>
+          <a href="/newloan">Vay tiền</a>
+          <a href="/login" className="btn btn-primary" onClick={handleLogout}>
+            {name ? "Đăng xuất" : "Đăng nhập"}
           </a>
           {!name && (
             <a href="/signup" className="btn btn-outline-primary">
               Đăng ký
             </a>
           )}
-          {/* </div> */}
         </nav>
       </CSSTransition>
-      <button onClick={toggleNav} className="Burger">
-        🍔
-      </button>
     </header>
   );
 }

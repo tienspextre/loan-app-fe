@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../components/Header';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './UserHome.css';
 
 const UserHome = () => {
   const [name, setName] = useState('');
@@ -24,11 +21,11 @@ const UserHome = () => {
   };
 
   return (
-    <div className="user-home">
+    <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-8">
-          <div class="col-md-8 offset-md-2">
-            <table class="table table-bordered text-center">
+          <div className="col-md-8 offset-md-2">
+            <table className="table table-bordered text-center">
               <thead>
                 <tr>
                   <th scope="col">STT</th>
@@ -42,7 +39,7 @@ const UserHome = () => {
                 {loanApplications.map((application, index) => (
                   <tr key={application.id}>
                     <th scope="row">{index + 1}</th>
-                    <td>{application.amount}</td>
+                    <td className='text-end'>{application.amount}</td>
                     <td>{application.term}</td>
                     <td>{application.date}</td>
                     <td>
