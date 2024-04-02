@@ -13,7 +13,7 @@ function App() {
   return (
     <div className="App">
       <Header />
-      <div style={{ marginTop: "70px" }}>
+      <div style={{ marginTop: "70px", height: "calc(100vh - 70px)" }}>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />

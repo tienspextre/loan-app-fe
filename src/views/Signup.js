@@ -8,7 +8,7 @@ export default function Signup() {
   })
   return (
     <div style={{
-      height: "100vh",
+      height: "100%",
       background: 'radial-gradient(circle, rgba(66,134,244,1) 0%, rgba(55,59,68,1) 100%)',
       display: 'flex',
       justifyContent: 'center',
