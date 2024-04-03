@@ -71,7 +71,7 @@ export default function SignupForm() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ username, email, role: [{ id: 1 }, { id: 2 }], password })
+      body: JSON.stringify({ username, email, role: [{ id: 1 }], password })
     });
 
     if (response.ok) {

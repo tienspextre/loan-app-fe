@@ -48,20 +48,6 @@ const NewLoanForm = () => {
             <div className="card">
               <div className="card-body">
                 <h1 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>Đăng ký vay vốn</h1>
-                {/* <form>
-                  <div className="form-check form-check-inline">
-                      <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"/>
-                      <label className="form-check-label" htmlFor="inlineRadio1">Vay</label>
-                  </div>
-                  <div className="form-check form-check-inline">
-                      <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"/>
-                      <label className="form-check-label" htmlFor="inlineRadio2">2</label>
-                  </div>
-                  <div className="form-check form-check-inline">
-                      <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" disabled/>
-                      <label className="form-check-label" htmlFor="inlineRadio3">3 (disabled)</label>
-                  </div>
-              </form> */}
                 <form>
                   <div className="form-row">
                     <div className="form-group col-md-6">

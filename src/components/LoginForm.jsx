@@ -52,6 +52,7 @@ export default function LoginForm() {
         localStorage.setItem("roles", data.roles);
         localStorage.setItem("email", data.email);
         localStorage.setItem("username", data.username);
+        localStorage.setItem("isDelcared", data.isDeclared);
 
         window.location.href = "home";
       } else {

@@ -6,8 +6,8 @@ import Landing from "./views/Landing"; // Assuming you have a Home component
 import Home from "./views/Home";
 import NewLoan from "./views/NewLoan";
 import Signup from "./views/Signup";
-import SignupDetail from "./components/SignupDetail";
 import Header from "./components/Header";
+import LoanApplication from "./views/LoanApplication";
 
 function App() {
   return (
@@ -18,9 +18,9 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/loan/:id" element={<LoanApplication />} />
           <Route path="/newloan" element={<NewLoan />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/signupdetail" element={<SignupDetail />} />
         </Routes>
       </div>
     </div>

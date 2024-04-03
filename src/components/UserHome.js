@@ -1,57 +1,38 @@
 import React, { useEffect, useState } from 'react';
+import LoanApplicationTable from './LoanApplicationTable';
 
 const UserHome = () => {
   const [name, setName] = useState('');
   const [loanApplications, setLoanApplications] = useState([]);
 
-  // Sample loanApplications data
-  useEffect(() => {
-    // Fetch or set loanApplications data
-    const sampleData = [
-      { id: 1, amount: 1000, term: '6 months', date: '2024-03-26' },
-      { id: 2, amount: 2000, term: '12 months', date: '2024-03-27' },
-      { id: 3, amount: 1500, term: '9 months', date: '2024-03-28' }
-    ];
-    setLoanApplications(sampleData);
-  }, []);
 
   const handleDetailClick = (userId) => {
     alert(`Detail button clicked for user ${userId}`);
     // Implement your logic for handling the detail button click here
   };
 
+  useEffect(() => {
+    const fetchLoanApplications = async () => {
+      const requestOptions = {
+        method: "GET",
+        redirect: "follow"
+      };
+
+      try {
+        const response = await fetch("http://localhost:8080/api/loanApplications", requestOptions);
+        const result = await response.json();
+        setLoanApplications(result);
+      } catch (error) {
+        console.error(error);
+      };
+    }
+
+    fetchLoanApplications();
+  }, [])
+
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-8">
-          <div className="col-md-8 offset-md-2">
-            <table className="table table-bordered text-center">
-              <thead>
-                <tr>
-                  <th scope="col">STT</th>
-                  <th scope="col">Số tiền</th>
-                  <th scope="col">Kỳ hạn</th>
-                  <th scope="col">Ngày vay</th>
-                  <th scope="col">Hành động</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loanApplications.map((application, index) => (
-                  <tr key={application.id}>
-                    <th scope="row">{index + 1}</th>
-                    <td className='text-end'>{application.amount}</td>
-                    <td>{application.term}</td>
-                    <td>{application.date}</td>
-                    <td>
-                      <button className="btn btn-primary btn-sm" onClick={() => handleDetailClick(application.id)}> Chi tiết </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+    <div className="p-3 mt-3">
+      <LoanApplicationTable dataArray={loanApplications} />
     </div>
   );
 };
