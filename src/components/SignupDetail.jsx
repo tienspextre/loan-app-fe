@@ -172,7 +172,7 @@ export default function SignupForm() {
                     <RequiredSharp /> Số tài khoản:
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
                     id="accountNumber"
                     placeholder="Nhập số tài khoản"
@@ -186,10 +186,10 @@ export default function SignupForm() {
                     <RequiredSharp /> CCCD/CMND:
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
                     id="idNumber"
-                    placeholder="Nhập số idNumber/CMND"
+                    placeholder="Nhập số CCCD"
                     value={idNumber}
                     onChange={(e) => setidNumber(e.target.value)}
                     required
@@ -226,7 +226,7 @@ export default function SignupForm() {
                     <RequiredSharp /> Số điện thoại:
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
                     id="phone"
                     placeholder="Nhập số điện thoại"

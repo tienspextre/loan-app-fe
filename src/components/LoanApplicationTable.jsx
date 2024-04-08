@@ -1,5 +1,13 @@
 import React from "react";
 import "./style/loanTable.css";
+import { formatCurrency } from "../utils/fomat";
+
+const keyMoneyFomat = [
+  "loanAmount",
+  "currentEearning",
+  "totalCapital",
+  "insuranceAmount",
+];
 
 const LoanApplicationTable = ({ dataArray }) => {
   const rolesString = localStorage.getItem("roles");
@@ -155,15 +163,19 @@ const LoanApplicationTable = ({ dataArray }) => {
               <td>{data.contactInfo2.fullName}</td>
               <td>{data.contactInfo2.relationship}</td>
               <td>{data.contactInfo2.phoneNumber}</td> */}
-              <td>{data.loanInfo.loanAmount}</td>
+              <td className="text-end">
+                {formatCurrency(data.loanInfo.loanAmount)}
+              </td>
               <td>{data.loanInfo.loanTerm}</td>
               {/* <td>{data.loanInfo.currentEearning}</td> */}
-              <td>{data.loanInfo.loanInterestRate}</td>
-              <td>{data.loanInfo.interestRateMargin}</td>
-              <td>{data.capitalUsage.totalCapital}</td>
+              <td>{data.loanInfo.loanInterestRate}%</td>
+              <td>{data.loanInfo.interestRateMargin}%</td>
+              {/* <td>{data.capitalUsage.totalCapital}</td> */}
               {/* <td>{data.capitalUsage.purpose}</td> */}
               {/* <td>{data.capitalUsage.source}</td> */}
-              {/* <td>{data.loanInsurance.insuranceAmount}</td> */}
+              <td className="text-end">
+                {formatCurrency(data.loanInsurance.insuranceAmount)}
+              </td>
 
               {data.status === "APPROVED" ? (
                 <td className="text-success">Đã duyệt</td>

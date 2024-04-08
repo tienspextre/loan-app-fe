@@ -11,10 +11,10 @@ const nameDirectory = {
     phoneNumber: "Số điện thoại",
     address: "Địa chỉ",
     branchInfo: {
-      name: "Chi nhánh",
+      _name: "Chi nhánh",
       id: "ID Chi nhánh",
       province: {
-        name: "Tỉnh",
+        _name: "Tỉnh",
         id: "ID Tỉnh/Thành phố",
         name: "Tên Tỉnh/Thành phố",
         region: "Vùng miền",
@@ -22,7 +22,16 @@ const nameDirectory = {
       branchName: "Tên Chi nhánh",
       address: "Địa chỉ Chi nhánh",
     },
-    user: "Người dùng",
+    user: {
+      _name: "Người dùng",
+      id: "Id người dùng",
+      username: "Tài khoản",
+      email: "Email",
+      isDeclared: "Khai báo",
+      roles: {
+        _name: "Vị trí",
+      },
+    },
   },
   personalInfo: {
     id: "ID Thông tin cá nhân",
@@ -36,7 +45,7 @@ const nameDirectory = {
     address: "Địa chỉ",
   },
   contactInfo1: {
-    name: "Thông tin liên hệ",
+    _name: "Thông tin liên hệ",
     id: "ID Thông tin liên hệ 1",
     fullName: "Họ và tên",
     relationship: "Quan hệ",
@@ -52,7 +61,7 @@ const nameDirectory = {
     id: "ID Thông tin khoản vay",
     loanAmount: "Số tiền vay",
     loanTerm: "Thời hạn vay",
-    currentEearning: "Thu nhập hiện tại",
+    currentEarning: "Thu nhập hiện tại",
     loanInterestRate: "Lãi suất vay",
     interestRateMargin: "Biên độ lãi suất",
   },
@@ -63,7 +72,7 @@ const nameDirectory = {
     source: "Nguồn vốn",
   },
   loanInsurance: {
-    name: "Bảo hiểm hợp đồng",
+    _name: "Bảo hiểm hợp đồng",
     id: "ID Bảo hiểm khoản vay",
     insuranceAmount: "Số tiền bảo hiểm",
   },
@@ -73,7 +82,7 @@ const nameDirectory = {
 
 const keyMoneyFomat = [
   "loanAmount",
-  "currentEearning",
+  "currentEarning",
   "totalCapital",
   "insuranceAmount",
 ];
@@ -88,6 +97,11 @@ const genders = {
   FEMALE: "Nữ",
 };
 
+const roles = {
+  ROLE_USER: "Người dùng",
+  ROLE_STAFF: "Nhân viên",
+};
+
 const SubDataCard = ({ title, data, name }) => {
   return (
     <div className="mb-3">
@@ -96,9 +110,29 @@ const SubDataCard = ({ title, data, name }) => {
           {Object.entries(data).map(([key, value]) => (
             <li key={key}>
               <strong>
-                {typeof name[key] === "object" ? name["name"] : name[key]}:
+                {typeof name[key] === "object"
+                  ? key === "roles"
+                    ? name[key]["_name"]
+                    : name["_name"]
+                  : name[key]}
+                :
               </strong>{" "}
-              {typeof value === "object" ? (
+              {key === "isDeclared" ? (
+                value === 1 ? (
+                  "Rồi"
+                ) : (
+                  "Chưa"
+                )
+              ) : key === "roles" ? (
+                value.map((role, _id) => (
+                  <SubDataCard
+                    key={_id}
+                    title={key}
+                    data={{ [role.id]: roles[role.name] }}
+                    name={{ 1: "1", 2: "2" }}
+                  />
+                ))
+              ) : typeof value === "object" ? (
                 <SubDataCard title={key} data={value} name={name[key]} />
               ) : (
                 value
@@ -126,10 +160,20 @@ const DataCard = ({ title, data, name }) => {
               key !== "id" && (
                 <li key={key}>
                   <strong>
-                    {typeof name[key] === "object" ? name[key].name : name[key]}
+                    {typeof name[key] === "object"
+                      ? name[key]._name
+                      : name[key]}
                     :
                   </strong>{" "}
-                  {typeof value === "object" ? (
+                  {key === "dob" ? (
+                    formatDate(value)
+                  ) : keyMoneyFomat.includes(key) ? (
+                    formatCurrency(value)
+                  ) : key === "relationship" ? (
+                    relationships[value]
+                  ) : key === "gender" ? (
+                    genders[value]
+                  ) : typeof value === "object" ? (
                     <>
                       <SubDataCard
                         key={_id}
@@ -138,14 +182,6 @@ const DataCard = ({ title, data, name }) => {
                         name={name[key]}
                       />
                     </>
-                  ) : key === "dob" ? (
-                    formatDate(value)
-                  ) : keyMoneyFomat.includes(key) ? (
-                    formatCurrency(value)
-                  ) : key === "relationship" ? (
-                    relationships[value]
-                  ) : key === "gender" ? (
-                    genders[value]
                   ) : (
                     value
                   )}
@@ -225,7 +261,7 @@ const DisplayData = ({ data }) => {
               data.status === "APPROVED"
                 ? "bg-success"
                 : data.status === "PENDING"
-                ? "bg-grey"
+                ? "bg-warning"
                 : "bg-danger"
             }`}
           >
