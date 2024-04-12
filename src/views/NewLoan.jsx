@@ -6,8 +6,8 @@ const NewLoan = () => {
   const [isDeclare, setIsDeclare] = useState(0);
 
   useEffect(() => {
-    const isDelcareStored = localStorage.getItem("isDelcared");
-    setIsDeclare(isDelcareStored);
+    const isDelcareStored = localStorage.getItem("isDeclared");
+    setIsDeclare(parseInt(isDelcareStored, 10));
   }, []);
 
   return (
@@ -18,7 +18,7 @@ const NewLoan = () => {
           "linear-gradient(90deg, rgba(55,59,68,1) 0%, rgba(66,134,244,1) 100%)",
       }}
     >
-      {isDeclare === "0" ? (
+      {isDeclare === 0 ? (
         <div
           style={{
             display: "flex",
