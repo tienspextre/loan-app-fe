@@ -86,7 +86,12 @@ export default function LoginForm() {
           <div className="card">
             <div className="card-body">
               <h4 className="card-title mb-4">Đăng nhập</h4>
-              <form>
+              <form
+                onSubmit={handleLogin}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleLogin(e);
+                }}
+              >
                 <div className="mb-3">
                   <label htmlFor="username" className="form-label">
                     <RequiredSharp /> Username:
@@ -129,7 +134,6 @@ export default function LoginForm() {
                 <button
                   type="button"
                   className="btn btn-primary w-100 mt-3 fs-5"
-                  onClick={handleLogin}
                 >
                   Đăng nhập
                 </button>
