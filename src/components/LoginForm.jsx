@@ -87,6 +87,7 @@ export default function LoginForm() {
             <div className="card-body">
               <h4 className="card-title mb-4">Đăng nhập</h4>
               <form
+                className="needs-validation"
                 onSubmit={handleLogin}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleLogin(e);
@@ -132,7 +133,7 @@ export default function LoginForm() {
                   Bạn chưa có tài khoản, <a href="/signup">Đăng ký</a>
                 </div>
                 <button
-                  type="button"
+                  type="submit"
                   className="btn btn-primary w-100 mt-3 fs-5"
                 >
                   Đăng nhập

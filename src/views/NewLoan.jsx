@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import NewLoanForm from "../components/NewLoanForm";
-import SignupForm from "../components/SignupDetail";
+import SignupDetail from "../components/SignupDetail";
+import { NewLoanProvider } from "../layout/NewLoanProvider";
 
 const NewLoan = () => {
   const [isDeclare, setIsDeclare] = useState(0);
@@ -30,13 +31,14 @@ const NewLoan = () => {
           <div className="h1">
             Bạn phải khai báo thông tin trước khi vay tiền
           </div>
-          <button className="btn btn-success">Khai báo</button>
           <div className="w-100">
-            <SignupForm />
+            <SignupDetail onSuccess={() => setIsDeclare(1)} />
           </div>
         </div>
       ) : (
-        <NewLoanForm />
+        <NewLoanProvider>
+          <NewLoanForm />
+        </NewLoanProvider>
       )}
     </div>
   );

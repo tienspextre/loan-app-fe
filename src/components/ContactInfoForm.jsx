@@ -1,5 +1,6 @@
 import React from "react";
 import RequiredSharp from "./RequiredSharp";
+import { useNewLoan } from "../layout/NewLoanProvider";
 const RELATIONSHIPS = [
   {
     en: "Father",
@@ -63,10 +64,43 @@ const RELATIONSHIPS = [
   },
 ];
 
-const ContactInfoForm = ({ contactInfo, setContactInfo }) => {
+const ContactInfoForm = ({ number }) => {
+  const {
+    newLoan,
+    handleChangeValue,
+    refreshValidateMessage,
+    hanldValidateMessage,
+    validateMessage,
+  } = useNewLoan();
+
+  const handleNumberRange = (e, min, max, field) => {
+    const inputValue = e.target.value;
+    handleChangeValue(e.target.value, `contactInfo${number}`, field);
+
+    if (inputValue === "") {
+      refreshValidateMessage(`contactInfo${number}`, field);
+    }
+
+    const validateIdNumber = (minLength, maxLength, value) => {
+      const regex = new RegExp(`^\\d{${minLength},${maxLength}}$`);
+      return regex.test(value);
+    };
+
+    if (!validateIdNumber(min, max, inputValue)) {
+      hanldValidateMessage(
+        `contactInfo${number}`,
+        field,
+        min === max
+          ? `Độ dài phải có đủ ${max} số!`
+          : `Độ dài phải từ ${min}-${max} số!`
+      );
+    } else {
+      refreshValidateMessage(`contactInfo${number}`, field);
+    }
+  };
   return (
     <>
-      <div className="form-group col-sm-8 col-lg-6">
+      <div className="form-group mb-3 col-sm-8 col-lg-6">
         <label htmlFor="inputName1">
           <RequiredSharp />
           Họ tên:
@@ -76,14 +110,18 @@ const ContactInfoForm = ({ contactInfo, setContactInfo }) => {
           className="form-control"
           id="inputName1"
           placeholder="Tên người thân"
-          value={contactInfo.fullName}
+          value={newLoan[`contactInfo${number}`].fullName}
           onChange={(e) =>
-            setContactInfo((prev) => ({ ...prev, fullName: e.target.value }))
+            handleChangeValue(
+              e.target.value,
+              `contactInfo${number}`,
+              "fullName"
+            )
           }
           required
         />
       </div>
-      <div className="form-group col-sm-8 col-lg-6">
+      <div className="form-group mb-3 col-sm-8 col-lg-6">
         <label htmlFor="inputRelation1">
           <RequiredSharp />
           Mối quan hệ:
@@ -91,12 +129,13 @@ const ContactInfoForm = ({ contactInfo, setContactInfo }) => {
         <select
           id="inputRelation1"
           className="form-select"
-          value={contactInfo.relationship} // Set the value of the select to the selectedBranch state
+          value={newLoan[`contactInfo${number}`].relationship} // Set the value of the select to the selectedBranch state
           onChange={(e) =>
-            setContactInfo((prev) => ({
-              ...prev,
-              relationship: e.target.value,
-            }))
+            handleChangeValue(
+              e.target.value,
+              `contactInfo${number}`,
+              "relationship"
+            )
           }
           required // Call handleBranchChange when the value changes
         >
@@ -107,26 +146,28 @@ const ContactInfoForm = ({ contactInfo, setContactInfo }) => {
           ))}
         </select>
       </div>
-      <div className="form-group col-sm-8 col-lg-6">
+      <div className="form-group mb-3 col-sm-8 col-lg-6">
         <label htmlFor="inputPhone1">
           <RequiredSharp />
           Số điện thoại:
         </label>
         <input
           type="text"
-          className="form-control"
+          className={`form-control ${
+            validateMessage[`contactInfo${number}`].phoneNumber.invalid
+              ? "is-invalid"
+              : ""
+          }`}
           id="inputPhone1"
           placeholder=""
-          value={contactInfo.phoneNumber}
+          value={newLoan[`contactInfo${number}`].phoneNumber}
           pattern="^0\d{9}$"
-          onChange={(e) =>
-            setContactInfo((prev) => ({
-              ...prev,
-              phoneNumber: e.target.value,
-            }))
-          }
+          onChange={(e) => handleNumberRange(e, 10, 10, "phoneNumber")}
           required
         />
+        <div className="invalid-feedback">
+          {validateMessage[`contactInfo${number}`].phoneNumber.message}
+        </div>
       </div>
     </>
   );

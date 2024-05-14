@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import UserHome from "../components/UserHome";
+import { ModalProvider } from "../layout/ModalProvider";
 
 const Home = () => {
   useEffect(() => {
@@ -26,7 +27,9 @@ const Home = () => {
       >
         Danh sách hợp đồng
       </div>
-      <UserHome />
+      <ModalProvider>
+        <UserHome />
+      </ModalProvider>
     </div>
   );
 };

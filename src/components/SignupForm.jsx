@@ -74,7 +74,7 @@ export default function SignupForm() {
     });
 
     if (response.ok) {
-      const data = await response.json();
+      // const data = await response.json();
       const response1 = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
         headers: {
@@ -83,11 +83,19 @@ export default function SignupForm() {
         body: JSON.stringify({ username, password }),
       });
 
+      const data1 = await response1.json();
       if (response1.ok) {
-        console.log("Đăng nhập thành công");
-        navigate("/login", { replace: true });
+        localStorage.setItem("accessToken", data1.accessToken);
+        localStorage.setItem("tokenType", data1.tokenType);
+        localStorage.setItem("id", data1.id);
+        localStorage.setItem("roles", data1.roles);
+        localStorage.setItem("email", data1.email);
+        localStorage.setItem("username", data1.username);
+        localStorage.setItem("isDeclared", data1.isDeclared);
+
+        navigate("/home", { replace: true });
       } else {
-        alert(data.message);
+        alert(data1.message);
       }
     } else {
       const data = await response.json();

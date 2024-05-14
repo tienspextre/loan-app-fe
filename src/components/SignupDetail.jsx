@@ -1,24 +1,71 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DatePicker from "react-datepicker";
 import RequiredSharp from "./RequiredSharp";
+import { validateEmail } from "../utils/validate";
 
-export default function SignupForm() {
+const VALIDATE_MESSAGE = {
+  accountNumber: {
+    invalid: false,
+    message: "",
+  },
+  legal: {
+    invalid: false,
+    message: "",
+  },
+  emailAddress: {
+    invalid: false,
+    message: "",
+  },
+  phoneNumber: {
+    invalid: false,
+    message: "",
+  },
+  address: { invalid: false, message: "" },
+  branchInfo: {
+    invalid: false,
+    message: "",
+  },
+};
+
+export default function SignupDetail({ onSuccess }) {
   const [phone, setPhone] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("-1");
   const [selectedProvince, setSelectedProvince] = useState("-1");
   const [branches, setBranches] = useState(null);
   const [address, setAddress] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
-  const [idNumber, setidNumber] = useState("");
-  const [dob, setDob] = useState(new Date());
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [id, setId] = useState("");
-  const [gender, setGender] = useState("MALE");
-  const [email, setEmail] = useState("");
+  const [legal, setLegal] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
   const [province, setProvince] = useState(null);
+
+  const [validateMessage, setValidMessage] = useState(VALIDATE_MESSAGE);
+
   const navigate = useNavigate();
+
+  const refreshValidateMessage = (field) => {
+    if (field) {
+      setValidMessage((prev) => ({
+        ...prev,
+        [field]: {
+          invalid: false,
+          message: "",
+        },
+      }));
+    } else {
+      setValidMessage(VALIDATE_MESSAGE);
+    }
+  };
+
+  const checkAllFieldsValid = () => {
+    for (const key in validateMessage) {
+      if (validateMessage.hasOwnProperty(key)) {
+        if (validateMessage[key].invalid) {
+          return false; // If any invalid field is found, return false
+        }
+      }
+    }
+    return true; // If no invalid field is found, return true
+  };
 
   const fetchBranchInfos = async (provinceId) => {
     if (provinceId === "-1" || provinceId === -1) {
@@ -64,13 +111,19 @@ export default function SignupForm() {
 
   const handleSignup = async (event) => {
     event.preventDefault();
+    if (!checkAllFieldsValid()) {
+      return;
+    }
+
+    refreshValidateMessage();
+
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
       accountNumber: accountNumber,
-      legal: idNumber,
-      emailAddress: email,
+      legal: legal,
+      emailAddress: emailAddress,
       phoneNumber: phone,
       address: address,
       branchInfo: {
@@ -95,6 +148,8 @@ export default function SignupForm() {
       );
       const result = await response.json();
       localStorage.setItem("isDeclared", 1);
+      alert("Bạn khai báo thông tin thành công!");
+      onSuccess();
     } catch (error) {
       console.error(error);
     }
@@ -115,6 +170,56 @@ export default function SignupForm() {
     fetchBranchInfos(event.target.value);
   };
 
+  const handleNumberRange = (e, setValue, min, max, field) => {
+    const inputValue = e.target.value;
+    setValue(e.target.value);
+
+    if (inputValue === "") {
+      refreshValidateMessage(field);
+    }
+
+    const validateIdNumber = (minLength, maxLength, value) => {
+      const regex = new RegExp(`^\\d{${minLength},${maxLength}}$`);
+      return regex.test(value);
+    };
+
+    if (!validateIdNumber(min, max, inputValue)) {
+      setValidMessage((prev) => ({
+        ...prev,
+        [field]: {
+          invalid: true,
+          message:
+            min === max
+              ? `Độ dài phải có đủ ${max} số!`
+              : `Độ dài phải từ ${min}-${max} số!`,
+        },
+      }));
+    } else {
+      refreshValidateMessage(field);
+    }
+  };
+
+  const handleEmail = (e, setValue, field) => {
+    const inputValue = e.target.value;
+    setValue(e.target.value);
+
+    if (inputValue === "") {
+      refreshValidateMessage(field);
+    }
+
+    if (!validateEmail(inputValue)) {
+      setValidMessage((prev) => ({
+        ...prev,
+        [field]: {
+          invalid: true,
+          message: `Email bạn nhập chưa đúng định dạng!`,
+        },
+      }));
+    } else {
+      refreshValidateMessage(field);
+    }
+  };
+
   return (
     <div className="container mt-3">
       <div className="row justify-content-center">
@@ -123,103 +228,77 @@ export default function SignupForm() {
             <div className="card-body">
               <h5 className="card-title mb-4">Nhập thông tin</h5>
               <form onSubmit={handleSignup}>
-                {/* <div className="mb-3">
-                  <label htmlFor="lastName" className="form-label">
-                    <RequiredSharp /> Họ:
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="lastName"
-                    placeholder="Nhập họ"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="firstName" className="form-label">
-                    <RequiredSharp /> Tên:
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="firstName"
-                    placeholder="Nhập tên"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    required
-                  />
-                </div> */}
-                {/* <div className="mb-3">
-                  <label htmlFor="gender" className="form-label">
-                    <RequiredSharp /> Giới tính:
-                  </label>
-                  <select
-                    id="inputGenger"
-                    className="form-select"
-                    value={gender} // Set the value of the select to the selectedBranch state
-                    name="gender"
-                    onChange={(e) => setGender(e.target.value)}
-                    required // Call handleBranchChange when the value changes
-                  >
-                    <option value="MALE">Male</option>
-                    <option value="FEMALE">Female</option>
-                  </select>
-                </div> */}
                 <div className="mb-3">
                   <label htmlFor="accountNumber" className="form-label">
                     <RequiredSharp /> Số tài khoản:
                   </label>
                   <input
                     type="number"
-                    className="form-control"
+                    className={`form-control ${
+                      validateMessage.accountNumber.invalid ? "is-invalid" : ""
+                    }`}
                     id="accountNumber"
                     placeholder="Nhập số tài khoản"
                     value={accountNumber}
-                    onChange={(e) => setAccountNumber(e.target.value)}
+                    onChange={(e) =>
+                      handleNumberRange(
+                        e,
+                        setAccountNumber,
+                        8,
+                        15,
+                        "accountNumber"
+                      )
+                    }
                     required
                   />
+                  <div className="invalid-feedback">
+                    {validateMessage.accountNumber.message}
+                  </div>
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="idNumber" className="form-label">
+                  <label htmlFor="legal" className="form-label">
                     <RequiredSharp /> CCCD/CMND:
                   </label>
                   <input
                     type="number"
-                    className="form-control"
-                    id="idNumber"
+                    className={`form-control ${
+                      validateMessage.legal.invalid ? "is-invalid" : ""
+                    }`}
+                    id="legal"
                     placeholder="Nhập số CCCD"
-                    value={idNumber}
-                    onChange={(e) => setidNumber(e.target.value)}
+                    value={legal}
+                    onChange={(e) =>
+                      handleNumberRange(e, setLegal, 12, 12, "legal")
+                    }
                     required
                   />
+                  <div className="invalid-feedback">
+                    {validateMessage.legal.message}
+                  </div>
                 </div>
-                {/* <div className="mb-3">
-                  <label htmlFor="dob" className="form-label">
-                    <RequiredSharp /> Ngày sinh:
-                  </label>
-                  <br />
-                  <DatePicker
-                    selected={dob}
-                    onChange={(date) => setDob(date)}
-                    required
-                  />
-                </div> */}
                 <div className="mb-3">
-                  <label htmlFor="email" className="form-label has-validation">
+                  <label
+                    htmlFor="emailAddress"
+                    className="form-label has-validation"
+                  >
                     <RequiredSharp /> Email:
                   </label>
                   <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    placeholder="Nhập email"
-                    pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    type="text"
+                    className={`form-control ${
+                      validateMessage.emailAddress.invalid ? "is-invalid" : ""
+                    }`}
+                    id="emailAddress"
+                    placeholder="Nhập emailAddress"
+                    value={emailAddress}
+                    onChange={(e) =>
+                      handleEmail(e, setEmailAddress, "emailAddress")
+                    }
                     required
                   />
+                  <div className="invalid-feedback">
+                    {validateMessage.emailAddress.message}
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="phone" className="form-label">

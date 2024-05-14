@@ -1,10 +1,20 @@
 import React from "react";
 import RequiredSharp from "./RequiredSharp";
+import { useNewLoan } from "../layout/NewLoanProvider";
+import { validateCurrency } from "../utils/validate";
 
-const CapitalUsageForm = ({ capitalUsage, setCapitalUsage }) => {
+const CapitalUsageForm = () => {
+  const {
+    newLoan,
+    handleChangeValue,
+    refreshValidateMessage,
+    hanldValidateMessage,
+    validateMessage,
+  } = useNewLoan();
+
   return (
     <>
-      <div className="form-group col-sm-8 col-lg-6">
+      <div className="form-group mb-3 col-sm-8 col-lg-6">
         <label htmlFor="inputBase">
           <RequiredSharp />
           Vốn tự có:
@@ -14,12 +24,16 @@ const CapitalUsageForm = ({ capitalUsage, setCapitalUsage }) => {
           className="form-control"
           id="inputBase"
           placeholder=""
-          value={capitalUsage.totalCapital}
+          value={newLoan.capitalUsage.totalCapital}
           onChange={(e) =>
-            setCapitalUsage((prev) => ({
-              ...prev,
-              totalCapital: e.target.value,
-            }))
+            handleChangeValue(
+              validateCurrency(
+                e.target.value,
+                newLoan.capitalUsage.totalCapital
+              ),
+              "capitalUsage",
+              "totalCapital"
+            )
           }
           required
         />
@@ -29,41 +43,30 @@ const CapitalUsageForm = ({ capitalUsage, setCapitalUsage }) => {
           <RequiredSharp />
           Mục đích sử dụng:
         </label>
-        <select
+        <input
           id="why"
-          className="form-select"
-          value={capitalUsage.purpose} // Set the value of the select to the selectedBranch state
+          className="form-control"
+          value={newLoan.capitalUsage.purpose}
           onChange={(e) =>
-            setCapitalUsage((prev) => ({
-              ...prev,
-              purpose: e.target.value,
-            }))
+            handleChangeValue(e.target.value, "capitalUsage", "purpose")
           }
-        >
-          <option value="HOME_LOAN">Mua nhà</option>
-          <option value="CAR_LOAN">Mua xe</option>
-          <option value="EDUCATION_LOAN">Học tập</option>
-        </select>
+          required
+        />
       </div>
       <div className="mb-3 col-sm-8 col-lg-6">
         <label htmlFor="source" className="form-label">
           <RequiredSharp />
-          Phương thức trả lãi:
+          Nguồn trả lãi:
         </label>
-        <select
+        <input
           id="source"
-          className="form-select"
-          value={capitalUsage.source} // Set the value of the select to the selectedBranch state
+          className="form-control"
+          value={newLoan.capitalUsage.source}
           onChange={(e) =>
-            setCapitalUsage((prev) => ({
-              ...prev,
-              source: e.target.value,
-            }))
+            handleChangeValue(e.target.value, "capitalUsage", "source")
           }
-        >
-          <option value="BANK_TRANSFER">Chuyển khoản</option>
-          <option value="ACCOUNT_DEDUCTION">Trừ vào tài khoản</option>
-        </select>
+          required
+        />
       </div>
     </>
   );

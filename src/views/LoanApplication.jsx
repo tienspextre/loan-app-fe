@@ -47,7 +47,17 @@ const LoanApplication = () => {
       >
         Chi tiết hợp đồng
       </div>
-      {la && <DisplayData data={la} />}
+      {la && (
+        <>
+          <div className="m-2">
+            <a className="btn btn-danger" href={`/interest/${la.id}`}>
+              Tính lãi suất
+            </a>
+            <br />
+          </div>
+          <DisplayData data={la} />
+        </>
+      )}
     </div>
   );
 };

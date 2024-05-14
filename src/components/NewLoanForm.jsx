@@ -1,74 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./NewLoanForm.css";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import RequiredSharp from "./RequiredSharp";
 import ContactInfoForm from "./ContactInfoForm";
 import LoanInfoForm from "./LoanInfoForm";
 import CapitalUsageForm from "./CapitalUsageForm";
+import PersonalInfoForm from "./PersonalInfoForm";
+import { useNewLoan } from "../layout/NewLoanProvider";
 
 const NewLoanForm = () => {
-  const [personalInfo, setPersonalInfo] = useState({
-    id: 0,
-    firstName: "Nguyen Van",
-    lastName: "Ads",
-    dob: "2000-03-25T04:11:46.020Z",
-    gender: "MALE",
-    idNumber: "4343476567",
-    phone: "13123211",
-    email: "Aasd@gmail.com",
-    address: "HANOI",
-  });
-  const [accountInfo, setAccountInfo] = useState({
-    id: 0,
-    accountNumber: "string",
-    legal: "string",
-    emailAddress: "Aasd@gmail.com",
-    phoneNumber: "1231451354",
-    address: "string",
-    branchInfo: {
-      id: 0,
-      province: {
-        id: 0,
-        name: "ANGIANG",
-        region: "string",
-      },
-      branchName: "string",
-      address: "string",
-    },
-  });
-  const [contactInfo1, setContactInfo1] = useState({
-    id: 0,
-    fullName: "NGUYEN VAN B",
-    relationship: "FATHER",
-    phoneNumber: "0987654321",
-  });
-  const [contactInfo2, setContactInfo2] = useState({
-    id: 0,
-    fullName: "NGUYEN THI C",
-    relationship: "MOTHER",
-    phoneNumber: "0987667567",
-  });
-  const [loanInfo, setLoanInfo] = useState({
-    id: 0,
-    loanAmount: 80000000,
-    loanTerm: 36,
-    currentEarning: 1500000,
-    loanInterestRate: 0.07,
-    interestRateMargin: 0.04,
-  });
-  const [capitalUsage, setCapitalUsage] = useState({
-    id: 0,
-    totalCapital: 50000000,
-    purpose: "Mua nha",
-    source: "Luong",
-  });
-
-  const [loanInsurance, setLoanInsurance] = useState({
-    id: 0,
-    insuranceAmount: 6800000,
-  });
+  const { newLoan, setNewLoan, hanldValidateMessage } = useNewLoan();
 
   useEffect(() => {
     const fetchAccountInfo = async (userId) => {
@@ -83,7 +25,7 @@ const NewLoanForm = () => {
           requestOptions
         );
         const result = await response.json();
-        setAccountInfo(result);
+        setNewLoan((prev) => ({ ...prev, accountInfo: result }));
       } catch (error) {
         console.error(error);
       }
@@ -96,30 +38,18 @@ const NewLoanForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const loanApplication = {
-      accountInfo: accountInfo,
-      personalInfo: personalInfo,
-      contactInfo1: contactInfo1,
-      contactInfo2: contactInfo2,
-      loanInfo: loanInfo,
-      capitalUsage: capitalUsage,
-      loanInsurance: loanInsurance,
-      status: "PENDING",
-      referenceNumber: "AAAAA",
-    };
-
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
       id: 0,
-      accountInfo: accountInfo,
-      personalInfo: personalInfo,
-      contactInfo1: contactInfo1,
-      contactInfo2: contactInfo2,
-      loanInfo: loanInfo,
-      capitalUsage: capitalUsage,
-      loanInsurance: loanInsurance,
+      accountInfo: newLoan.accountInfo,
+      personalInfo: newLoan.personalInfo,
+      contactInfo1: newLoan.contactInfo1,
+      contactInfo2: newLoan.contactInfo2,
+      loanInfo: newLoan.loanInfo,
+      capitalUsage: newLoan.capitalUsage,
+      loanInsurance: newLoan.loanInsurance,
       referenceNumber: "AAAAA",
     });
 
@@ -135,11 +65,32 @@ const NewLoanForm = () => {
         "http://localhost:8080/api/loanApplications",
         requestOptions
       );
-      const result = await response.json();
-      alert("Gửi đơn thành công. Đợi nhân viên duyệt đơn!");
-      setTimeout(() => {
-        window.location.href = "/home";
-      }, 2000);
+      if (response.ok) {
+        // const result = await response.json();
+        alert("Gửi đơn thành công. Đợi nhân viên duyệt đơn!");
+        setTimeout(() => {
+          window.location.href = "/home";
+        }, 2000);
+      } else {
+        const error = await response.json();
+        const errorMessage = `Something wrong with: ${error.message}`;
+
+        const [errorType, errorField] = error.message.split(" ");
+        if (errorType === "DUPLICATE") {
+          if (errorField === "idNumber") {
+            hanldValidateMessage(
+              "personalInfo",
+              "idNumber",
+              "CCCD đã tồn tại, vui lòng thử số khác!"
+            );
+          } else {
+            alert("Tài khoản đang vay hợp đồng khác!");
+            window.location.href = "/home";
+          }
+        }
+
+        throw new Error(errorMessage);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -162,87 +113,11 @@ const NewLoanForm = () => {
                 >
                   Đăng ký vay vốn
                 </h1>
-                <form onSubmit={handleSubmit}>
+                <form className="needs-validation" onSubmit={handleSubmit}>
                   <div className="border border-black rounded p-3 mt-3">
                     <h3>Thông tin cá nhân</h3>
-                    <div className="form-group col-sm-8 col-lg-6">
-                      <label htmlFor="inputFirstName">
-                        <RequiredSharp />
-                        Họ:
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="inputFirstName"
-                        placeholder="Họ"
-                        value={personalInfo.firstName}
-                        onChange={(e) =>
-                          setPersonalInfo((prev) => ({
-                            ...prev,
-                            firstName: e.target.value,
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="form-group col-sm-8 col-lg-6">
-                      <label htmlFor="inputName">
-                        <RequiredSharp />
-                        Tên:
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="inputName"
-                        placeholder="Tên"
-                        value={personalInfo.lastName}
-                        onChange={(e) =>
-                          setPersonalInfo((prev) => ({
-                            ...prev,
-                            lastName: e.target.value,
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="form-group col-sm-8 col-lg-6">
-                      <label htmlFor="inputPhone">
-                        <RequiredSharp />
-                        Số điện thoại:
-                      </label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        id="inputPhone"
-                        placeholder="Số điện thoại"
-                        title="Số điện thoại"
-                        required
-                        value={personalInfo.phone}
-                        onChange={(e) =>
-                          setPersonalInfo((prev) => ({
-                            ...prev,
-                            phone: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                    <div className="form-group col-sm-8 col-lg-6">
-                      <label htmlFor="dob" className="form-label">
-                        <RequiredSharp />
-                        Ngày sinh:
-                      </label>
-                      <br />
-                      <DatePicker
-                        className="form-select"
-                        selected={personalInfo.dob}
-                        onChange={(date) =>
-                          setPersonalInfo({ ...personalInfo, dob: date })
-                        }
-                        required
-                        placeholderText="mm/dd/yyyy"
-                      />
-                    </div>
-                    <div className="form-group col-sm-8 col-lg-6">
+                    <PersonalInfoForm />
+                    <div className="form-group mb-3 col-sm-8 col-lg-6">
                       <label htmlFor="inputAccountNumber">
                         <RequiredSharp />
                         STK:
@@ -252,12 +127,11 @@ const NewLoanForm = () => {
                         className="form-control"
                         id="inputAccountNumber"
                         placeholder="Số tài khoản"
-                        required
-                        value={accountInfo.accountNumber}
+                        value={newLoan.accountInfo.accountNumber || ""}
                         disabled
                       />
                     </div>
-                    <div className="form-group col-sm-8 col-lg-6">
+                    <div className="form-group mb-3 col-sm-8 col-lg-6">
                       <label htmlFor="inputCCCD">
                         <RequiredSharp />
                         CMND/CCCD:
@@ -267,12 +141,11 @@ const NewLoanForm = () => {
                         className="form-control"
                         id="inputCCCD"
                         placeholder="CMND/CCCD"
-                        required
-                        value={accountInfo.legal}
+                        value={newLoan.accountInfo.legal || ""}
                         disabled
                       />
                     </div>
-                    <div className="form-group col-sm-8 col-lg-6">
+                    <div className="form-group mb-3 col-sm-8 col-lg-6">
                       <label htmlFor="inputAddress">
                         <RequiredSharp />
                         Địa chỉ:
@@ -282,13 +155,11 @@ const NewLoanForm = () => {
                         className="form-control"
                         id="inputAddress"
                         placeholder="Địa chỉ"
-                        required
-                        value={accountInfo.address}
+                        value={newLoan.accountInfo.address || ""}
                         disabled
                       />
                     </div>
-
-                    <div className="form-group col-sm-8 col-lg-6">
+                    <div className="form-group mb-3 col-sm-8 col-lg-6">
                       <label htmlFor="inputEmail4">
                         <RequiredSharp />
                         Email:
@@ -298,48 +169,28 @@ const NewLoanForm = () => {
                         className="form-control"
                         id="inputEmail4"
                         placeholder="Email"
-                        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                        required
-                        value={accountInfo.emailAddress}
+                        value={newLoan.accountInfo.emailAddress || ""}
                         disabled
                       />
                     </div>
                   </div>
                   <div className="border border-black rounded p-3 mt-3">
                     <h3>Thông tin hợp đồng</h3>
-                    <LoanInfoForm
-                      loanInfo={loanInfo}
-                      setLoanInfo={setLoanInfo}
-                      setLoanInsuranceAmount={(value) =>
-                        setLoanInsurance((prev) => ({
-                          ...prev,
-                          insuranceAmount: value,
-                        }))
-                      }
-                    />
+                    <LoanInfoForm />
                   </div>
                   <div className="rounded border border-black p-3 mt-3">
                     <h3>Thông tin người thân 1</h3>
-                    <ContactInfoForm
-                      contactInfo={contactInfo1}
-                      setContactInfo={setContactInfo1}
-                    />
+                    <ContactInfoForm number="1" />
                     <h3>Thông tin người thân 2</h3>
-                    <ContactInfoForm
-                      contactInfo={contactInfo2}
-                      setContactInfo={setContactInfo2}
-                    />
+                    <ContactInfoForm number="2" />
                   </div>
                   <div className="border border-black rounded p-3 mt-3">
                     <h3>Phương án sử dụng vốn</h3>
-                    <CapitalUsageForm
-                      capitalUsage={capitalUsage}
-                      setCapitalUsage={setCapitalUsage}
-                    />
+                    <CapitalUsageForm />
                   </div>
                   <div className="border border-black rounded p-3 mt-3">
                     <h3>Bảo hiểm hợp đồng</h3>
-                    <div className="form-group col-sm-8 col-lg-6">
+                    <div className="form-group mb-3 col-sm-8 col-lg-6">
                       <label htmlFor="a">
                         <RequiredSharp />
                         Tiền bảo hiểm:
@@ -349,13 +200,12 @@ const NewLoanForm = () => {
                         className="form-control"
                         id="a"
                         placeholder="Tiền bảo hiểm"
-                        required
-                        value={loanInsurance.insuranceAmount}
+                        value={newLoan.loanInsurance.insuranceAmount}
                         disabled
                       />
                     </div>
                   </div>
-                  <div className="form-group">
+                  <div className="form-group mb-3">
                     <div className="form-check">
                       <input
                         className="form-check-input"

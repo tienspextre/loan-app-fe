@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import "./style/loanTable.css";
 import { formatCurrency } from "../utils/fomat";
+import { useModalContext } from "../layout/ModalProvider";
 
 const keyMoneyFomat = [
   "loanAmount",
@@ -10,11 +11,15 @@ const keyMoneyFomat = [
 ];
 
 const LoanApplicationTable = ({ dataArray }) => {
+  const modalRef = useRef(null);
+  const inputRef = useRef(null);
   const rolesString = localStorage.getItem("roles");
 
   const roles = rolesString ? rolesString.split(",") : [];
 
   const isStaff = roles.includes("ROLE_STAFF");
+
+  const { open } = useModalContext();
 
   const handleApprove = async (id) => {
     const isConfirmed = window.confirm(
@@ -65,6 +70,24 @@ const LoanApplicationTable = ({ dataArray }) => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    const modalElement = modalRef.current;
+    const inputElement = inputRef.current;
+
+    if (modalElement && inputElement) {
+      const focusInput = () => {
+        inputElement.focus();
+      };
+
+      modalElement.addEventListener("shown.bs.modal", focusInput);
+
+      return () => {
+        // Cleanup: Remove event listener on unmount
+        modalElement.removeEventListener("shown.bs.modal", focusInput);
+      };
+    }
+  }, []);
 
   return (
     <div>
@@ -219,6 +242,16 @@ const LoanApplicationTable = ({ dataArray }) => {
                 >
                   Chi tiết
                 </a>
+                <br />
+                {data.status === "APPROVED" && (
+                  <button
+                    type="button"
+                    className="btn btn-success mt-1"
+                    onClick={() => open({ loan: data })}
+                  >
+                    Xác nhận giải ngân
+                  </button>
+                )}
               </td>
             </tr>
           ))}

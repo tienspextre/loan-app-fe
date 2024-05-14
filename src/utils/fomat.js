@@ -9,3 +9,7 @@ export function formatDate(inputDate) {
 export function formatCurrency(amount) {
     return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 }
+
+export function decimalToPercent(decimalValue) {
+    return (decimalValue * 100).toFixed(2) + ' %'; // Multiply by 100 and add the % symbol
+}

@@ -8,7 +8,8 @@ import NewLoan from "./views/NewLoan";
 import Signup from "./views/Signup";
 import Header from "./components/Header";
 import LoanApplication from "./views/LoanApplication";
-import AuthLayout from "./hook/AuthLayout";
+import AuthLayout from "./layout/AuthLayout";
+import InterestPage from "./views/InterestPage";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/loan/:id" element={<LoanApplication />} />
             <Route path="/newloan" element={<NewLoan />} />
+            <Route path="/interest/:id" element={<InterestPage />} />
           </Route>
         </Routes>
       </div>
